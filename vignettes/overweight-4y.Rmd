@@ -15,13 +15,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setmodel}
-library(ranger)
-path <- path.expand("~/Project/zonmw_kansrijke_start/WP4/modellen_CBS/20230530/Overgewicht")
+```{r setoutcome}
 fn_model <- "20230525_rfr_mtry.rds"
 fn_codebook <- "202211MH codebook JGZ predictors.xlsx"
-model <- readRDS(file.path(path, fn_model))
 outcome <- "overweight-4y"
+```
+
+```{r setmodel, eval = FALSE}
+library(ranger)
+path <- path.expand("~/Project/zonmw_kansrijke_start/WP4/modellen_CBS/20230530/Overgewicht")
+model <- readRDS(file.path(path, fn_model))
 ```
 
 ## Description
@@ -30,16 +33,172 @@ BDS model ``r outcome`` predicts overweight risk around the age of 4 years given
 
 This implementation is based on the random forest model version ``r fn_model`` and the code book ``r fn_codebook``. Here's a summary of the fitted model:
 
-```{r}
-model
+```
+Ranger result
+
+Call:
+ ranger(overweight ~ ., data = overweight_train, num.trees = 1000,      importance = "impurity", probability = TRUE) 
+
+Type:                             Probability estimation 
+Number of trees:                  1000 
+Sample size:                      13149 
+Number of independent variables:  138 
+Mtry:                             11 
+Target node size:                 10 
+Variable importance mode:         impurity 
+Splitrule:                        gini 
+OOB prediction error (Brier s.):  0.0761 
 ```
 
 ## Predictor names and importance
 
-The model contains `r length(importance(model))` predictors. The names of the predictor variables, ordered in terms of their importance score, are
+The model contains 138 predictors. The names of the predictor variables, ordered in terms of their importance score, are
 
-```{r}
-sort(round(importance(model), 1), decreasing = TRUE)
+```{r eval = FALSE}
+v <- sort(round(importance(model), 1), decreasing = TRUE)
+data.frame(importance = v)
+```
+
+```
+                                    importance
+bmi_4mnd_znl                             103.1
+gewicht_4mnd_znl                          84.0
+bmi_3mnd_znl                              64.8
+gewicht_3mnd_znl                          56.5
+bmi_8wks_znl                              49.6
+gewicht_8wks_znl                          43.7
+bmi_4wks_znl                              41.7
+PRNL_birthweight                          39.3
+lengte_4mnd_znl                           37.6
+gewicht_4wks_znl                          36.6
+lengte_3mnd_znl                           34.8
+lengte_8wks_znl                           34.1
+ZVWK_sumtotal_mo                          33.1
+income_fa                                 32.9
+lengte_4wks_znl                           32.0
+income_parents                            32.0
+ZVWK_hospital_mo                          31.9
+ZVWK_GP_other_fa                          31.2
+income_mo                                 30.9
+ZVWK_GP_other_mo                          30.9
+ZVWK_GP_consult_mo                        29.8
+ZVWK_pharmacy_mo                          29.1
+ED_woz                                    29.0
+ZVWK_sumtotal_fa                          28.7
+age_at_birth_mo                           27.4
+ZVWK_birth_obstetrician_mo                26.3
+ZVWK_birth_maternitycare_mo               26.1
+SPOLIS_wages_fa                           26.0
+age_at_birth_fa                           25.9
+ZVWK_GP_regist_mo                         25.1
+hh_vermogen                               25.0
+ZVWK_GP_regist_fa                         24.1
+ZVWK_GP_consult_fa                        22.9
+SPOLIS_wages_mo                           22.8
+SPOLIS_paidhours_fa                       21.9
+SPOLIS_paidhours_mo                       21.2
+ZVWK_pharmacy_fa                          20.5
+income_hh                                 18.8
+educationlevel_mo                         18.3
+PRNL_gestational_age_week_f               17.5
+ZVWK_appliances_mo                        16.7
+educationlevel_fa                         15.2
+ZVWK_hospital_fa                          14.9
+opl1                                      11.8
+ZVWK_other_mo                             10.4
+ZVWK_other_fa                             10.1
+opl2                                       9.7
+geslacht                                   9.2
+STED                                       9.1
+PRNL_parity                                8.8
+LAND_ETNG_fa                               8.7
+ZVWK_appliances_fa                         8.1
+LAND_ACHTS_fa                              6.8
+ZVWK_patient_transport_lie_mo              6.8
+LAND_ETNG_mo                               6.7
+LAND_ACHTS_mo                              6.7
+SECM_mo                                    6.7
+SECM_fa                                    6.3
+ZVWK_physical_other_mo                     6.2
+SPOLIS_contract_mo                         5.7
+SPOLIS_contract_fa                         5.6
+LAND_ETNG_gebl2                            5.4
+LAND_ACHTS_gebl2                           5.4
+LAND_ACHTS_gebl1                           5.3
+ED_rentown                                 5.2
+LAND_ETNG_gebl1                            5.0
+GBA_generation_fa                          4.7
+income_hh_source                           4.6
+house_ownership                            4.4
+ZVWK_dentalcare_mo                         4.0
+ZVWK_physical_therapy_mo                   4.0
+ZVWK_mentalhealth_bas_mo                   4.0
+residence_same_for_parents                 3.9
+GBA_generation_mo                          3.8
+ZVWK_mentalhealth_spec_mo                  3.7
+ZVWK_mentalh_spec_nostay_inst_mo           3.5
+SECM_disability_mo                         3.1
+GBA_generation_kid                         3.0
+premature_birth                            2.9
+ZVWK_mentalh_spec_nostay_ind_mo            2.9
+l_income_hh_pov_binary                     2.8
+SECM_selfemployed_fa                       2.8
+ZVWK_GP_basic_mo                           2.7
+SECM_student_fa                            2.6
+l_income_hh_min_binary                     2.5
+SECM_selfemployed_mo                       2.5
+SECM_otherwork_mo                          2.5
+SECM_socialassistance_mo                   2.5
+ZVWK_mentalhealth_bas_fa                   2.5
+SECM_employee_fa                           2.4
+NA_dummy_bmi_4wks_znl                      2.4
+NA_dummy_bmi_4mnd_znl                      2.4
+l_income_hh_pov_4j_binary                  2.3
+l_income_hh_min_4j_binary                  2.3
+SECM_unemployed_mo                         2.3
+ZVWK_dentalcare_fa                         2.3
+ZVWK_abroad_fa                             2.3
+ZVWK_GP_basic_fa                           2.2
+ZVWK_patient_transport_lie_fa              2.2
+NA_dummy_SPOLIS_wages_mo                   2.2
+SECM_employee_mo                           2.1
+SECM_otherwork_fa                          2.1
+SECM_unemployed_fa                         2.1
+SECM_disability_fa                         2.0
+NA_dummy_SPOLIS_wages_fa                   2.0
+PRNL_multiples                             1.9
+ZVWK_abroad_mo                             1.9
+NA_dummy_income_hh                         1.9
+ZVWK_physical_therapy_fa                   1.8
+SECM_student_mo                            1.7
+ZVWK_mentalhealth_spec_fa                  1.7
+SECM_otherassistance_fa                    1.6
+NA_dummy_ZVWK_mentalh_spec_other_fa        1.6
+SECM_director_fa                           1.5
+ZVWK_physical_other_fa                     1.5
+NA_dummy_ZVWK_GP_basic_fa                  1.5
+SECM_familywork_fa                         1.4
+ZVWK_mentalh_spec_nostay_inst_fa           1.4
+SECM_otherassistance_mo                    1.3
+SECM_socialassistance_fa                   1.2
+NA_dummy_ZVWK_GP_basic_mo                  1.1
+NA_dummy_ZVWK_mentalh_spec_other_mo        1.1
+SECM_familywork_mo                         1.0
+NA_dummy_income_mo                         1.0
+SECM_retirement_mo                         0.9
+SECM_retirement_fa                         0.9
+ZVWK_mentalh_spec_nostay_ind_fa            0.9
+ZVWK_patient_transport_sit_mo              0.5
+ZVWK_birth_obstetrician_fa                 0.5
+NA_dummy_income_fa                         0.5
+ZVWK_birth_maternitycare_fa                0.4
+NA_dummy_age_at_birth_fa                   0.4
+SECM_director_mo                           0.3
+ZVWK_mentalhealth_spec_stay_fa             0.3
+ZVWK_mentalhealth_spec_stay_mo             0.0
+ZVWK_mentalh_spec_other_mo                 0.0
+ZVWK_patient_transport_sit_fa              0.0
+ZVWK_mentalh_spec_other_fa                 0.0
 ```
 
 ## Connection between predictors and Basisdataset
