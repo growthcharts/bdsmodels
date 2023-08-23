@@ -1,0 +1,156 @@
+---
+title: "BDS model: overweight-4y"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{BDS model: overweight-4y}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  echo = FALSE,
+  comment = "#>"
+)
+```
+
+```{r setmodel}
+library(ranger)
+path <- path.expand("~/Project/zonmw_kansrijke_start/WP4/modellen_CBS/20230530/Overgewicht")
+fn_model <- "20230525_rfr_mtry.rds"
+fn_codebook <- "202211MH codebook JGZ predictors.xlsx"
+model <- readRDS(file.path(path, fn_model))
+outcome <- "overweight-4y"
+```
+
+## Description
+
+BDS model ``r outcome`` predicts overweight risk around the age of 4 years given child data up to the age of 4 months. The model was fitted by Mirthe Hendriks for the C4PO project using combined CBS microdata. 
+
+This implementation is based on the random forest model version ``r fn_model`` and the code book ``r fn_codebook``. Here's a summary of the fitted model:
+
+```{r}
+model
+```
+
+## Predictor names and importance
+
+The model contains `r length(importance(model))` predictors. The names of the predictor variables, ordered in terms of their importance score, are
+
+```{r}
+sort(round(importance(model), 1), decreasing = TRUE)
+```
+
+## Connection between predictors and Basisdataset
+
+Not all predictors are defined in the Dutch Basisdataset and many variables have low importance scores. 
+
+The following table describes the relevant fields defined by the Dutch Basisdataset for a subset for most important predictors.
+
+| Variabele                  | BDS               |JAMES| Imp | In | Comments          |
+|----------------------------|-------------------|-----|-----|----|-------------------|
+| BMI                        | 235, 245, 724, 20 | Y   | 103 | Y  | check             |
+| weight                     | 245, 724, 20      | Y   | 84  | Y  | check             |
+| PRNL_birthweight           | 110               | Y   | 39  | Y  | check             |
+| length/height              | 235, 724, 20      | Y   | 38  | Y  | check             |
+| ZVWK_sumtotal_mo           |                   | N   | 33  | N  | not available     |
+| income_fa                  |                   | N   | 33  | N  | not available     |
+| income_parents             |                   | N   | 32  | N  | not available     |
+| income_mo                  |                   | N   | 31  | N  | not available     |
+| ED_woz                     |                   | N   | 29  | Y  | derive from PC4   |
+| ZVWK_sumtotal_fa           |                   | N   | 29  | N  | not available     |
+| age_at_birth_mo            | 63, 62, 20        | Y   | 27  | Y  | check             |
+| age_at_birth_fa            | 63, 62, 20        | Y   | 26  | Y  | check             |
+| SPOLIS_paidhours_fa        |                   | N   | 22  | N  | not available     |
+| SPOLIS_paidhours_mo        |                   | N   | 21  | N  | not available     |
+| PRNL_gestational_age       | 82                | Y   | 18  | Y  | check             |
+| educationlevel_mo          |                   | N   | 18  | N  | duplicate         |
+| educationlevel_fa          |                   | N   | 15  | N  | duplicate         |
+| opl1                       | 66, 62            | N   | 12  | Y  | check             |
+| opl2                       | 66, 62            | N   | 10  | Y  | check             |
+| sex                        | 19                | Y   | 9   | Y  | check             |
+| PRNL_parity                | 741               | N   | 9   | Y  | check             |
+| STED                       | 16                | Y   | 9   | Y  | derive from PC4   |
+| LAND_ETNG_gebl1            | 71, 62            | Y   | 9   | Y  | check             |
+| LAND_ACHTS_gebl1           | 71, 62            | N   | 9   | N  | duplicate         |
+| LAND_ETNG_gebl2            | 71, 62            | Y   | 7   | Y  | check             |
+| LAND_ACHTS_gebl2           | 71, 62            | N   | 7   | N  | duplicate         |
+| GBA_generation_fa          |                   | N   | 5   | N  | low imp           |
+| ED_rentown                 |                   | N   | 5   | N  | low imp           |
+| GBA_generation_mo          |                   | N   | 4   | N  | low imp           |
+| residence_same_for_parents |                   | N   | 4   | N  | low imp           |
+| GBA_generation_kid         |                   | N   | 3   | N  | low imp           |
+| premature_birth            | 82                | N   | 3   | N  | duplicate         |
+| SECM\_{xxx}                |                   | N   | 3   | N  | low imp           |
+| PRNL_multiples             | 108               | N   | 2   | N  | low imp           |
+| birth date                 | 20                | Y   | \-  | N  | not in model      |
+| measurement date           | 724               | Y   | \-  | N  | not in model      |
+| height mother              | 238               | Y   | \-  | N  | not in model      |
+| height father              | 240               | Y   | \-  | N  | not in model      |
+| weight mother              |                   | N   | \-  | N  | not in model      |
+| weight father              |                   | N   | \-  | N  | not in model      |
+| smoking pregnancy          | 91                | Y   | \-  | N  | not in model      |
+
+The table maps the overlap between two data sources: BDS (and accessible through JAMES) and the CBS data used to create the model. Predictors are ordered in terms of the importance score. The column `In` specifies which predictors are selected to be included into a compressed model with 15 predictors (12 fixed, 3 time-varying). The most important variables (child `BMI`, `weight` and `height`) are available for personal risk prediction. Income variables are not available, but a `ED_woz` value for the PC4 postal code is a reasonable proxy to parental income. Age of parents at birth, gestational age and parental education are included, and well as some of the less important variables (sex, parity, parental birth country).
+
+Note that importance scores vary depending on what other variables are in the model, so for a proper picture of variable importance, we need to refit the model using the subset of the 15 predictors.
+
+## Predictor codings
+
+In other to be able to apply the random forest model in practice, it is vital that the variable codings used in the CBS-model and JAMES-model match.
+
+Here is a proposal for variable coding in both models:
+
+| JAMES | CBS name              | Code| Description                                   |
+|-------|-----------------------|-----|-----------------------------------------------|
+|`bmi_z`| `BMI_{time}_znl`      |     | Body Mass Index, Z-score (AGD::nl4.bmi)       |
+|`hgt_z`| `lengte_{time}_znl`   |     | Length/height, Z-score (AGD::nl4.hgt)         |
+|`wgt_z`| `gewicht_{time}_znl`  |     | Weight, Z-score (AGD::nl4.wgt)                |
+| `age` |                       |     | Decimal age: round((date - dob) / 365.25, 4)  |
+| `bw`  | `PRNL_birthweight`    |     | Birth weight (grammes)                        |
+| `woz` | `ED_woz`              |     | WOZ value - immovable property (EURO)         |
+| `agem`| `age_at_birth_mo`     |     | Mother age at child's birth (years)           |
+| `agef`| `age_at_birth_fa`     |     | Father age at child's birth (years)           |
+| `ga`  | `PRNL_gestational_age`|     | Gestational age (completed weeks)             |
+| `eduf`| `opl1`                |     | Level of education, biol father (number)      |
+|       |                       | 1   | None                                          |	
+|       |                       | 2   | Basis                                         |
+|       |                       | 3   | VSO/MLK/I(V)BO/VMBO-LWOO/practice             |
+|       |                       | 4   | LBO/VBO/VMBO-BBL&KBL                          |	
+|       |                       | 5   | MAVO/VMBO/GL&TL                               |
+|       |                       | 6   | MBO                                           |
+|       |                       | 7   | HAVO/VWO                                      |
+|       |                       | 8   | HBO/HTS/HEAO                                  |
+|       |                       | 9   | WO                                            |
+|       |                       | `NA`| Other (98), unknown (00)                      |
+| `edum`| `opl2`                |     | Level of education, biol mother (number)      |
+|       |                       |     | See `opl1` codes                              |
+| `sex` | `geslacht`            |     | Sex of child (number)                         |
+|       |                       | 1   | Male                                          |
+|       |                       | 0   | Female                                        |
+|       |                       | `NA`| Unknown, undetermined                         |
+| `par` | `PRNL_parity`         |     | Number of births (GA >=16w), inc this (number)|
+| `urb` | `STED`                |     | Urbanisation grade (number)                   |
+|       |                       | 1   | >= 2500 addresses/km^2                        |
+|       |                       | 2   | 1500-2500 addresses/km^2                      |
+|       |                       | 3   | 1000-1500 addresses/km^2                      |
+|       |                       | 4   |  500-1000 addresses/km^2                      |
+|       |                       | 5   | < 500 addresses/km^2                          |
+|       |                       | `NA`| Unknown                                       |
+| `ctrf`| `LAND_ETNG_gebl1`     |     | Country of birth, biological father (factor)  |
+|       |                       | 1   | Netherlands                                   |
+|       |                       | 2   | Morocco                                       |
+|       |                       | 3   | Turkey                                        |
+|       |                       | 4   | Surinam                                       |
+|       |                       | 5   | Former Netherlands Antilles and Aruba         |
+|       |                       | 6   | Other non-western countries                   |
+|       |                       | 7   | Other western countries                       |
+|       |                       | `NA`| Unknown                                       |
+| `ctrm`| `LAND_ETNG_gebl2`     |     | Country of birth, biological mother (factor)  |
+|       |                       |     | See `LAND_ETNG_gebl1` codes                   |
+
+
+## Strategy to deal with missing predictor values
+
+We still have to devise a strategy here.
