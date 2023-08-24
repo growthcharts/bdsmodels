@@ -19,6 +19,9 @@ Suggests:
     knitr,
     ranger,
     rmarkdown
+Remotes: 
+    growthcharts/centile,
+    growthcharts/nlreferences
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
