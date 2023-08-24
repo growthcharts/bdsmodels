@@ -22,9 +22,12 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/hello.html</loc>
+    <loc>/reference/collect_predictors.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pc4.html</loc>
   </url>
 </urlset>
