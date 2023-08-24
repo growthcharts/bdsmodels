@@ -9,8 +9,19 @@ Description: Risk prediction models for data collected in the Basisdatatset
     a model for predicting overweight at 4 years.
 License: AGPL (>= 3)
 Encoding: UTF-8
+Imports: 
+    centile,
+    dplyr,
+    nlreferences,
+    rlang,
+    tibble
 Suggests: 
     knitr,
     ranger,
     rmarkdown
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends: 
+    R (>= 2.10)
+LazyData: true
