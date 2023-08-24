@@ -275,13 +275,12 @@ Here is a proposal for variable coding in both models:
 | `eduf`| `opl1`                |     | Level of education, biol father (number)      |
 |       |                       | 1   | None                                          |	
 |       |                       | 2   | Basis                                         |
-|       |                       | 3   | VSO/MLK/I(V)BO/VMBO-LWOO/practice             |
-|       |                       | 4   | LBO/VBO/VMBO-BBL&KBL                          |	
-|       |                       | 5   | MAVO/VMBO/GL&TL                               |
-|       |                       | 6   | MBO                                           |
-|       |                       | 7   | HAVO/VWO                                      |
-|       |                       | 8   | HBO/HTS/HEAO                                  |
-|       |                       | 9   | WO                                            |
+|       |                       | 3   | MLK/VMBO-LWOO/LBO/VBO/VMBO-BBL&KBL            |	
+|       |                       | 4   | MAVO/VMBO/GL&TL                               |
+|       |                       | 5   | MBO                                           |
+|       |                       | 6   | HAVO/VWO                                      |
+|       |                       | 7   | HBO/HTS/HEAO                                  |
+|       |                       | 8   | WO                                            |
 |       |                       | `NA`| Other (98), unknown (00)                      |
 | `edum`| `opl2`                |     | Level of education, biol mother (number)      |
 |       |                       |     | See `opl1` codes                              |
@@ -297,17 +296,18 @@ Here is a proposal for variable coding in both models:
 |       |                       | 4   |  500-1000 addresses/km^2                      |
 |       |                       | 5   | < 500 addresses/km^2                          |
 |       |                       | `NA`| Unknown                                       |
-| `ctrf`| `LAND_ETNG_gebl1`     |     | Country of birth, biological father (factor)  |
+| `ctrf`| `LAND_ACHTS_gebl1`    |     | Country of birth, biological father (factor)  |
 |       |                       | 1   | Netherlands                                   |
-|       |                       | 2   | Morocco                                       |
-|       |                       | 3   | Turkey                                        |
-|       |                       | 4   | Surinam                                       |
-|       |                       | 5   | Former Netherlands Antilles and Aruba         |
-|       |                       | 6   | Other non-western countries                   |
-|       |                       | 7   | Other western countries                       |
-|       |                       | `NA`| Unknown                                       |
-| `ctrm`| `LAND_ETNG_gebl2`     |     | Country of birth, biological mother (factor)  |
-|       |                       |     | See `LAND_ETNG_gebl1` codes                   |
+|       |                       | 2   | EU-15, other developed economies              |
+|       |                       | 3   | New EU-countries, economies in transition     |
+|       |                       | 4   | Northern Africa                               |
+|       |                       | 5   | East Asia                                     |
+|       |                       | 6   | Other Africa, Asia, Latin America             |
+|       |                       | 7   | Surinam and (former) Nederlands Antilles      |
+|       |                       | 8   | Turkey                                        |
+|       |                       | 9   | Unknown                                       |
+| `ctrm`| `LAND_ACHTS_gebl2`    |     | Country of birth, biological mother (factor)  |
+|       |                       |     | See `LAND_ACHTS_gebl1` codes                  |
 
 
 ## Strategy to deal with missing predictor values
