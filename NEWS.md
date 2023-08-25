@@ -1,3 +1,8 @@
+# bdsmodels 0.3.1
+
+- Refreshes the built-in data `pc4` and `table34` so that their output column have the right type and factor levels
+- Removes desired country levels info from `collect_predictors()`
+
 # bdsmodels 0.3.0
 
 - Adds a new function `collect_predictors()` for outcome `overweight-4y`
