@@ -16,10 +16,12 @@ Imports:
     rlang,
     tibble
 Suggests: 
+    bdsreader,
     knitr,
     ranger,
     rmarkdown
 Remotes: 
+    growthcharts/bdsreader,
     growthcharts/centile,
     growthcharts/nlreferences
 VignetteBuilder: knitr

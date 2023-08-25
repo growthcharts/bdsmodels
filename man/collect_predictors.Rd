@@ -17,3 +17,9 @@ A tibble with 1 row containing person data
 \description{
 Fill risk predictor data with target person data
 }
+\examples{
+library(bdsreader)
+fn <- system.file("examples/test.json", package = "bdsreader")
+m <- bdsreader::read_bds(fn)
+x <- collect_predictors(m)
+}

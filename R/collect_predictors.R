@@ -3,20 +3,16 @@
 #' @param tgt Target person data, according to JAMES internal format from `bdsreader`
 #' @param outcome  Character. Currently only `"overweight-4y"`
 #' @returns A tibble with 1 row containing person data
+#' @examples
+#' library(bdsreader)
+#' fn <- system.file("examples/test.json", package = "bdsreader")
+#' m <- bdsreader::read_bds(fn)
+#' x <- collect_predictors(m)
 #' @export
 collect_predictors <- function(tgt, outcome = "overweight-4y") {
   z <- NULL
 
   if (outcome == "overweight-4y") {
-    lev <- c("Netherlands",
-             "EU-15, other developed economies",
-             "New EU-countries, economies in transition",
-             "Northern Africa",
-             "East Asia",
-             "Other Africa, Asia, Latin America",
-             "Surinam and (former) Nederlands Antilles",
-             "Turkey",
-             "Unknown")
     x <- tgt$xyz
     p <- tgt$psn
     z <- tibble_row(
@@ -72,13 +68,13 @@ collect_predictors <- function(tgt, outcome = "overweight-4y") {
         NA_real_),
       eduf = ifelse(
         hasName(p, "eduf"),
-        case_match(p$eduf, 1 ~ 1, 2 ~ 2, c(3, 4) ~ 3, 5 ~ 4, 6 ~ 5, 7 ~ 6,
-                   8 ~ 7, 9 ~ 8),
+        case_match(as.integer(p$eduf), 1 ~ 1, 2 ~ 2, c(3, 4) ~ 3, 5 ~ 4,
+                   6 ~ 5, 7 ~ 6, 8 ~ 7, 9 ~ 8),
         NA_real_),
       edum = ifelse(
         hasName(p, "edum"),
-        case_match(p$edum, 1 ~ 1, 2 ~ 2, c(3, 4) ~ 3, 5 ~ 4, 6 ~ 5, 7 ~ 6,
-                   8 ~ 7, 9 ~ 8),
+        case_match(as.integer(p$edum), 1 ~ 1, 2 ~ 2, c(3, 4) ~ 3, 5 ~ 4,
+                   6 ~ 5, 7 ~ 6, 8 ~ 7, 9 ~ 8),
         NA_real_),
       sex = ifelse(
         hasName(p, "sex"),
@@ -86,14 +82,14 @@ collect_predictors <- function(tgt, outcome = "overweight-4y") {
         NA_real_),
       par = ifelse(
         hasName(p, "par"),
-        p$par,
+        as.numeric(p$par),
         NA_real_),
       urb =
-        match_pc4(p, "sted"),
+        match_pc4(p, "urb"),
       ctrf =
-        factor(NA_character_, levels = lev),
+        match_country(p, out = "achts", inp = "blbf"),
       ctrm =
-        factor(NA_character_, levels = lev))
+        match_country(p, out = "achts", inp = "blbm"))
 
     req_names <- c("id", "name",
                    "bmi_z_4m", "bmi_z_3m", "bmi_z_8w", "bmi_z_4w",
@@ -119,13 +115,27 @@ filter_z <- function(x, zname, lo, hi) {
     last(na_rm = TRUE)
 }
 
-match_pc4 <- function(p, out = c("woz", "sted")) {
+match_pc4 <- function(p, out = c("woz", "urb")) {
   out <- match.arg(out)
   if (!hasName(p, c("pc4"))) {
     return(NA_real_)
   }
   bdsmodels::pc4 |>
     filter(.data$pc4 == !! p$pc4) |>
+    pull(!! out) |>
+    first(na_rm = TRUE)
+}
+
+match_country <- function(p, out = c("achts"), inp = c("blbf", "blbm")) {
+
+  out <- match.arg(out)
+  inp <- match.arg(inp)
+  if (!hasName(p, inp)) {
+    return(factor(NA_character_,
+                  levels = levels(bdsmodels::table34$achts)))
+  }
+  bdsmodels::table34 |>
+    filter(.data$code == !! p[[inp]]) |>
     pull(!! out) |>
     first(na_rm = TRUE)
 }
