@@ -1,6 +1,8 @@
 #' Fill risk predictor data with target person data
 #'
-#' @param tgt Target person data, according to JAMES internal format from `bdsreader`
+#' @param tgt Target person data, according to JAMES internal format from `bdsreader`.
+#' If `tgt = NULL` (default) the function returns an empty data with all values
+#' set to missings.
 #' @param outcome  Character. Currently only `"overweight-4y"`
 #' @returns A tibble with 1 row containing person data
 #' @examples
@@ -9,7 +11,7 @@
 #' m <- bdsreader::read_bds(fn)
 #' x <- collect_predictors(m)
 #' @export
-collect_predictors <- function(tgt, outcome = "overweight-4y") {
+collect_predictors <- function(tgt = NULL, outcome = "overweight-4y") {
   z <- NULL
 
   if (outcome == "overweight-4y") {

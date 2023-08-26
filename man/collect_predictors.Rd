@@ -4,10 +4,12 @@
 \alias{collect_predictors}
 \title{Fill risk predictor data with target person data}
 \usage{
-collect_predictors(tgt, outcome = "overweight-4y")
+collect_predictors(tgt = NULL, outcome = "overweight-4y")
 }
 \arguments{
-\item{tgt}{Target person data, according to JAMES internal format from \code{bdsreader}}
+\item{tgt}{Target person data, according to JAMES internal format from \code{bdsreader}.
+If \code{tgt = NULL} (default) the function returns an empty data with all values
+set to missings.}
 
 \item{outcome}{Character. Currently only \code{"overweight-4y"}}
 }
