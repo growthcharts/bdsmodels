@@ -23,3 +23,14 @@
 #' @source \url{https://publicaties.rvig.nl/Landelijke_tabellen/Landelijke_tabellen_32_t_m_60_excl_tabel_35/Landelijke_Tabellen_32_t_m_60_in_csv_formaat}
 "table34"
 
+#' Mapping external - internal variable names
+#' @docType data
+#' @format A \code{data frame} with columns:
+#' \describe{
+#' \item{outcome}{Outcome name}
+#' \item{version}{Model version}
+#' \item{importance}{Importance score (for random forest/ranger)}
+#' \item{ex_name}{Name used in external model object}
+#' \item{in_name}{Name used internally by bdsmodels}
+#' }
+"mapping"
