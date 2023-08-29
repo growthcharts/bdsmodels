@@ -17,12 +17,14 @@ Imports:
     tibble
 Suggests: 
     bdsreader,
+    jamesdemodata,
     knitr,
     ranger,
     rmarkdown
 Remotes: 
     growthcharts/bdsreader,
     growthcharts/centile,
+    growthcharts/jamesdemodata,
     growthcharts/nlreferences
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
