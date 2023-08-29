@@ -2,10 +2,10 @@
 #'
 #' Use the internal table `mapping` to transform the internal data into the
 #' form used by the imported model.
-#' @inheritParams collect_predictors
 #'
 #' @param data Target data, e.g. as produced by `collect_predictors()`
 #' @param outcome  Character. Currently only `"overweight-4y"`
+#' @param version Character. Version number.
 #' @returns A tibble with 1 row containing person data
 #' @examples
 #' library(bdsreader)

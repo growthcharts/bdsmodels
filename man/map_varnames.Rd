@@ -10,6 +10,8 @@ map_varnames(data = NULL, outcome = "overweight-4y", version = "20230525")
 \item{data}{Target data, e.g. as produced by \code{collect_predictors()}}
 
 \item{outcome}{Character. Currently only \code{"overweight-4y"}}
+
+\item{version}{Character. Version number.}
 }
 \value{
 A tibble with 1 row containing person data
