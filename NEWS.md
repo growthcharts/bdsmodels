@@ -1,3 +1,8 @@
+# bdsmodels 0.3.2
+
+- Adds a new function `map_varnames()` that transforms the JAMES child data into the CBS model format
+- Adds a vignette documenting experiences with `ranger::predict.ranger()`
+
 # bdsmodels 0.3.1
 
 - Refreshes the built-in data `pc4` and `table34` so that their output column have the right type and factor levels
