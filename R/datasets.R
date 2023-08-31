@@ -34,3 +34,13 @@
 #' \item{in_name}{Name used internally by bdsmodels}
 #' }
 "mapping"
+
+#' Age map to divide measurement made in continuous age into age bins
+#' @docType data
+#' @format A \code{data frame} with columns:
+#' \describe{
+#' \item{label}{Name of age bin}
+#' \item{lo}{lower limit (days)}
+#' \item{hi}{higher limit (days)}
+#' }
+"age_map"
