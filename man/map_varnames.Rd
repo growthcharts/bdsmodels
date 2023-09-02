@@ -4,7 +4,7 @@
 \alias{map_varnames}
 \title{Maps variable names from internal to external naming}
 \usage{
-map_varnames(data = NULL, outcome = "overweight-4y", version = "20230525")
+map_varnames(data = NULL, outcome = "overweight-4y", version = "20230905")
 }
 \arguments{
 \item{data}{Target data, e.g. as produced by \code{collect_predictors()}}

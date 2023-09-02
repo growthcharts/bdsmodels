@@ -67,7 +67,7 @@ try(predict(mod, data = ex))
 
 Let's do a very crude repair by imputing zeroes everywhere.
 
-```{r}
+```{r eval = FALSE}
 fd <- ex
 fd$name <- ""
 fd[sapply(fd, is.factor)] <- 1

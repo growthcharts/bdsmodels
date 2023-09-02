@@ -16,7 +16,7 @@
 #' @export
 map_varnames <- function(data = NULL,
                          outcome = "overweight-4y",
-                         version = "20230525") {
+                         version = "20230905") {
   map <- bdsmodels::mapping |>
     filter(.data$outcome == !! outcome,
            .data$version == !! version) |>
