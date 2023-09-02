@@ -14,7 +14,8 @@ Imports:
     dplyr,
     nlreferences,
     rlang,
-    tibble
+    tibble,
+    tidyr
 Suggests: 
     bdsreader,
     jamesdemodata,

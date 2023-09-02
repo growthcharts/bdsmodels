@@ -8,8 +8,8 @@
 A \code{data frame} with columns:
 \describe{
 \item{label}{Name of age bin}
-\item{lo}{lower limit (days)}
-\item{hi}{higher limit (days)}
+\item{lo}{lower limit (decimal age)}
+\item{hi}{higher limit (decimal age)}
 }
 }
 \usage{

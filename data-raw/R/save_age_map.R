@@ -5,5 +5,7 @@ hi <- lo - 1
 lo <- lo[-length(lo)]
 hi <- hi[-1]
 age_map <- data.frame(label = labels, lo = lo, hi = hi)
+age_map$lo <- round(age_map$lo / 365.25, 4)
+age_map$hi <- round(age_map$hi / 365.25, 4)
 
 usethis::use_data(age_map, overwrite = TRUE)

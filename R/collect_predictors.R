@@ -15,88 +15,142 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y") {
   z <- NULL
 
   if (outcome == "overweight-4y") {
-    x <- tgt$xyz
+
+    # specify required time-varying variables
+    vpred <- c("bmi_z", "hgt_z", "wgt_z")
+    vtime <- c("4w", "8w", "3m", "4m")
+    dummies <- list("bmi_z", vtime)
+    v <- tidyr::expand_grid(vpred, vtime)
+    needed <- c(paste(v$vpred, v$vtime, sep = "_"))
+
+    # create age bins, select last observation within each bin
+    # and arrange Z-scores into a tibble with one row
+    tv <- tgt$xyz |>
+      select(all_of(c("age", "zname", "z"))) |>
+      filter(.data$zname %in% !! vpred) |>
+      mutate(gp = factor(findInterval(.data$age, bdsmodels::age_map$lo),
+                         levels = seq_along(bdsmodels::age_map$lo),
+                         labels = bdsmodels::age_map$label)) |>
+      filter(.data$gp %in% !! vtime) |>
+      group_by(.data$zname, .data$gp) |>
+      arrange(.data$age) |>
+      slice(n()) |>
+      select(-"age") |>
+      pivot_wider(names_from = c("zname", "gp"), values_from = "z")
+
+    # create dummies
+    dum <- paste(dummies[[1L]], dummies[[2L]], sep = "_")
+    obs <- intersect(names(tv), dum)
+    mis <- setdiff(dum, obs)
+    dv <- matrix(0, nrow = 1L, ncol = length(dum),
+                 dimnames = list(NULL, dum))
+    dv[, mis] <- 1
+    dimnames(dv)[[2L]] <- paste(dum, "NA", sep = "_")
+
+    # pad missing time-varying predictors with zeroes & dummies
+    vna <- setdiff(needed, names(tv))
+    tv <- bind_cols(
+      tv,
+      matrix(NA_real_, nrow = 1L, ncol = length(vna), dimnames = list(NULL, vna)),
+      dv)
+
+    # concatenate administrative variables, time-varying and fixed covariates
     p <- tgt$psn
     z <- tibble_row(
-      id = ifelse(
-        hasName(p, "id"),
-        p$id,
-        NA_integer_),
-      name = ifelse(
-        hasName(p, "name"),
-        p$name,
-        NA_character_),
-      bmi_z_4m =
-        filter_z(x, zname = "bmi_z", lo = 3.5/12, hi = 6.0/12),
-      bmi_z_3m =
-        filter_z(x, zname = "bmi_z", lo = 2.5/12, hi = 3.5/12),
-      bmi_z_8w =
-        filter_z(x, zname = "bmi_z", lo = 1.5/12, hi = 2.5/12),
-      bmi_z_4w =
-        filter_z(x, zname = "bmi_z", lo = 0.5/12, hi = 1.5/12),
-      wgt_z_4m =
-        filter_z(x, zname = "wgt_z", lo = 3.5/12, hi = 6.0/12),
-      wgt_z_3m =
-        filter_z(x, zname = "wgt_z", lo = 2.5/12, hi = 3.5/12),
-      wgt_z_8w =
-        filter_z(x, zname = "wgt_z", lo = 1.5/12, hi = 2.5/12),
-      wgt_z_4w =
-        filter_z(x, zname = "wgt_z", lo = 0.5/12, hi = 1.5/12),
-      hgt_z_4m =
-        filter_z(x, zname = "hgt_z", lo = 3.5/12, hi = 6.0/12),
-      hgt_z_3m =
-        filter_z(x, zname = "hgt_z", lo = 2.5/12, hi = 3.5/12),
-      hgt_z_8w =
-        filter_z(x, zname = "hgt_z", lo = 1.5/12, hi = 2.5/12),
-      hgt_z_4w =
-        filter_z(x, zname = "hgt_z", lo = 0.5/12, hi = 1.5/12),
-      bw = ifelse(
-        hasName(p, "bw"),
-        p$bw,
-        NA_real_),
+      id =
+        if (hasName(p, "id")) {
+          p$id
+        } else {
+          NA_integer_
+        },
+      name =
+        if (hasName(p, "name")) {
+          p$name
+        } else {
+          NA_character_
+        },
+      tv,
+      bw =
+        if (hasName(p, "bw")) {
+          p$bw
+        } else {
+          NA_real_
+        },
       woz =
         match_pc4(p, "woz"),
-      agem = ifelse(
-        hasName(p, "agem"),
-        p$agem,
-        NA_real_),
-      agef = ifelse(
-        hasName(p, "agef"),
-        p$agef,
-        NA_real_),
-      ga = ifelse(
-        hasName(p, "ga"),
-        p$ga,
-        NA_real_),
-      eduf = ifelse(
-        hasName(p, "eduf"),
-        case_match(as.integer(p$eduf), 1 ~ 1, 2 ~ 2, c(3, 4) ~ 3, 5 ~ 4,
-                   6 ~ 5, 7 ~ 6, 8 ~ 7, 9 ~ 8),
-        NA_real_),
-      edum = ifelse(
-        hasName(p, "edum"),
-        case_match(as.integer(p$edum), 1 ~ 1, 2 ~ 2, c(3, 4) ~ 3, 5 ~ 4,
-                   6 ~ 5, 7 ~ 6, 8 ~ 7, 9 ~ 8),
-        NA_real_),
-      sex = ifelse(
-        hasName(p, "sex"),
-        case_match(as.character(p$sex), "male" ~ 1, "female" ~ 0),
-        NA_real_),
-      par = ifelse(
-        hasName(p, "par"),
-        as.numeric(p$par),
-        NA_real_),
+      agem =
+        if (hasName(p, "agem")) {
+          p$agem - 1
+        } else {
+          NA_real_
+        },
+      agef =
+        if (hasName(p, "agef")) {
+          p$agef - 1
+        } else {
+          NA_real_
+        },
+      ga =
+        if (hasName(p, "ga")) {
+          p$ga
+        } else {
+          NA_real_
+        },
+      eduf =
+        if (hasName(p, "eduf")) {
+          case_match(p$eduf, 1 ~ "geen", 2 ~ "basis", c(3, 4) ~ "vmbopraktijk",
+                     5 ~ "vmbomavo", 6 ~ "mbo", 7 ~ "havovwo", 8 ~ "hbo",
+                     9 ~ "womaster", .default = "NAdummy") |>
+            factor(levels = c("geen", "basis", "vmbopraktijk", "vmbomavo",
+                              "mbo", "havovwo", "hbo", "womaster", "NAdummy"),
+                   ordered = TRUE)
+        } else {
+          factor("NAdummy",
+                 levels = c("geen", "basis", "vmbopraktijk", "vmbomavo",
+                            "mbo", "havovwo", "hbo", "womaster", "NAdummy"),
+                 ordered = TRUE)
+        },
+      edum =
+        if (hasName(p, "edum")) {
+          case_match(p$edum, 1 ~ "geen", 2 ~ "basis", c(3, 4) ~ "vmbopraktijk",
+                     5 ~ "vmbomavo", 6 ~ "mbo", 7 ~ "havovwo", 8 ~ "hbo",
+                     9 ~ "womaster", .default = "NAdummy") |>
+            factor(levels = c("geen", "basis", "vmbopraktijk", "vmbomavo",
+                              "mbo", "havovwo", "hbo", "womaster", "NAdummy"),
+                   ordered = TRUE)
+        } else {
+          factor("NAdummy",
+                 levels = c("geen", "basis", "vmbopraktijk", "vmbomavo",
+                            "mbo", "havovwo", "hbo", "womaster", "NAdummy"),
+                 ordered = TRUE)
+        },
+      sex =
+        if (hasName(p, "sex")) {
+          case_match(p$sex, "male" ~ "mannelijk", "female" ~ "vrouwelijk") |>
+            factor(levels = c("mannelijk", "vrouwelijk"))
+        } else {
+          factor(NA, levels = c("mannelijk", "vrouwelijk"))
+        },
+      par =
+        if (hasName(p, "par")) {
+          case_match(p$par, 0 ~ "0", 1 ~ "1", 2 ~ "2", 3 ~ "3", 4 ~ "4",
+                     5 ~ "5", 6 ~ "6+", 7 ~ "6+", 8 ~ "6+", 9 ~ "6+",
+                     .default = "NAdummy") |>
+            factor(levels = c("0", "1", "2", "3", "4", "5", "6+", "NAdummy"),
+                   ordered = TRUE)
+        } else {
+          factor("NA_dummy",
+                 levels = c("0", "1", "2", "3", "4", "5", "6+", "NAdummy"),
+                 ordered = TRUE)
+        },
       urb =
         match_pc4(p, "urb"),
       ctrf =
-        match_country(p, out = "achts", inp = "blbf"),
+        match_country(p, out = "etng", inp = "blbf"),
       ctrm =
-        match_country(p, out = "achts", inp = "blbm"))
+        match_country(p, out = "etng", inp = "blbm"))
 
-    req_names <- c("id", "name",
-                   "bmi_z_4m", "bmi_z_3m", "bmi_z_8w", "bmi_z_4w",
-                   "wgt_z_4m", "wgt_z_3m", "wgt_z_8w", "wgt_z_4w",
-                   "hgt_z_4m", "hgt_z_3m", "hgt_z_8w", "hgt_z_4w",
+    req_names <- c("id", "name", needed, paste(dum, "NA", sep = "_"),
                    "bw", "woz", "agem", "agef", "ga", "eduf", "edum",
                    "sex", "par", "urb", "ctrf", "ctrm")
     found <- hasName(z, req_names)
@@ -104,17 +158,8 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y") {
                           paste(req_names[!found], collapse = ", "))
   }
 
+  z <- select(z, all_of(req_names))
   return(z)
-}
-
-filter_z <- function(x, zname, lo, hi) {
-  if (any(!hasName(x, c("zname", "z")))) {
-    return(NA_real_)
-  }
-  x |>
-    filter(.data$zname == !! zname & .data$age >= !! lo & .data$age < !! hi) |>
-    pull("z") |>
-    last(na_rm = TRUE)
 }
 
 match_pc4 <- function(p, out = c("woz", "urb")) {
@@ -128,7 +173,7 @@ match_pc4 <- function(p, out = c("woz", "urb")) {
     first(na_rm = TRUE)
 }
 
-match_country <- function(p, out = c("achts"), inp = c("blbf", "blbm")) {
+match_country <- function(p, out = c("etng"), inp = c("blbf", "blbm")) {
 
   out <- match.arg(out)
   inp <- match.arg(inp)

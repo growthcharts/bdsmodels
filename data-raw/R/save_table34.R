@@ -18,4 +18,24 @@ table34$achts <- factor(NA_character_,
                         levels = 1:9,
                         labels = labels)
 
+labels <- c("autochtoon",
+            "marokko",
+            "turkije",
+            "suriname",
+            "voormalige nederlandse antillen en aruba",
+            "overige niet-westerse landen",
+            "overige westerse landen",
+            "onbekend",
+            "overige landen")
+table34$etng <- dplyr::case_match(table34$code,
+           6030 ~ "autochtoon",
+           5022 ~ "marokko",
+           c(6043, 7094, 8019) ~ "turkije",
+           5007 ~ "suriname",
+           c(7011, 5095, 5106, 5107, 5108, 5109, 5110) ~ "voormalige nederlandse antillen en aruba",
+           .default = "overige landen")
+
+table34$etng <- factor(table34$etng,
+                       levels = labels)
+
 usethis::use_data(table34, overwrite = TRUE)
