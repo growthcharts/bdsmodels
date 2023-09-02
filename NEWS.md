@@ -1,3 +1,9 @@
+# bdsmodels 0.3.3
+
+- Updates `collect_predictors()` in preparation to model `overweight-4y`, version `20230905`
+- Updates `map_varnames()` and built-in `mapping` variable in preparation to model `overweight-4y`, version `20230905`
+- Adds built-in variable `age_map` that defines how to bin ages
+
 # bdsmodels 0.3.2
 
 - Adds a new function `map_varnames()` that transforms the JAMES child data into the CBS model format
