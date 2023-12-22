@@ -49,7 +49,7 @@ fn <- system.file("extdata/bds_v3.0/graham/Nikki_G.json", package = "jamesdemoda
 # fn <- system.file("extdata/bds_v3.0/graham/Nienke_G.json", package = "jamesdemodata")  # geen data
 
 m <- bdsreader::read_bds(fn)
-x <- collect_predictors(m)
+x <- collect_predictors(m, purpose = "model")
 ex <- map_varnames(x)
 dim(ex)
 print(ex, width = Inf)
@@ -82,13 +82,13 @@ The estimated overweight probability varies roughly between 0.16 (Nikki_G, an ex
 ```{r}
 fn <- system.file("extdata/bds_v3.0/graham/Hasna_G.json", package = "jamesdemodata")
 m <- bdsreader::read_bds(fn)
-x <- collect_predictors(m)
+x <- collect_predictors(m, purpose = "model")
 print(x, width = Inf)
 ```
 
 ```{r}
 fn <- system.file("extdata/bds_v3.0/graham/Nikki_G.json", package = "jamesdemodata")
 m <- bdsreader::read_bds(fn)
-x <- collect_predictors(m)
+x <- collect_predictors(m, purpose = "model")
 print(x, width = Inf)
 ```
