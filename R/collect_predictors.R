@@ -198,6 +198,7 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
        ungroup()
 
 
+     p <- tgt$psn
 
     z <- tibble_row(
       id =
@@ -302,10 +303,11 @@ found <- hasName(z, req_names)
 if (any(!found)) stop("Could not find required name(s): ",
                       paste(req_names[!found], collapse = ", "))
 
+tvl <-
 tvl |>
   mutate(Datum = format(z$dob + age*365.25),
-         SDS = AGD::y2z(y = .data$bmi,
-                  x = .data$age,
+         SDS = AGD::y2z(y = tvl$bmi,
+                  x = tvl$age,
                   sex = ifelse(z$sex == "Meisje", "F", "M"),
                   ref = AGD::nl4.bmi),
         hgt = hgt * 10,
