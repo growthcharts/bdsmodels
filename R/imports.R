@@ -1,6 +1,6 @@
 #' @importFrom dplyr           all_of any_of arrange bind_cols case_match
 #'                             filter first group_by mutate n pull rename
-#'                             select slice
+#'                             select slice ungroup right_join
 #' @importFrom centile         y2z
 #' @importFrom nlreferences    set_refcodes
 #' @importFrom rlang           .data
