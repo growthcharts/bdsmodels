@@ -9,7 +9,9 @@
 #' @examples
 #' library(bdsreader)
 #' fn <- system.file("examples/test.json", package = "bdsreader")
-#' m <- bdsreader::read_bds(fn)
+#' fn <-system.file("extdata/bds_v2.0/smocc/Anne_S.json", package = "jamesdemodata")
+#' m <- bdsreader::read_bds(fn, append_ddi = TRUE)
+#' tgt <- m
 #' x <- collect_predictors(m)
 #' @export
 collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = "tab10") {
@@ -60,7 +62,20 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
         matrix(NA_real_, nrow = 1L, ncol = length(vna), dimnames = list(NULL, vna)),
         dv)
 
-    p <- tgt$psn
+      tpred <- c("ddicmm041", "ddicmm042", "bds823", "bds816")
+      lg <- tgt$xyz |>
+        select(all_of(c("age", "yname", "y"))) |>
+        filter(.data$age * 365.25 >= 678 & .data$age * 365.25 <= 1038 &
+                 .data$yname %in% !!tpred) |>
+        group_by(.data$yname) |> dplyr::slice_tail(n = 1)|> #als meerderen metingen, laatste nemen voor elke variabele.
+        pivot_wider(names_from = "yname", values_from = "y") |>
+        select(-.data$age)
+
+
+      p <- tgt$psn
+      if(nrow(lg) == 1){p <- cbind(p, lg)}
+
+
 
     z <- tibble_row(
       id =
@@ -158,11 +173,40 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
       ctrf =
         match_country(p, out = "etng", inp = "blbf"),
       ctrm =
-        match_country(p, out = "etng", inp = "blbm"))
+        match_country(p, out = "etng", inp = "blbm"),
+      zin2w =
+        if (hasName(p, "ddicmm041")){
+          case_match(p$ddicmm041, 0 ~ "-", 1 ~ "+",
+                     .default = "Onbekend")
+        } else {
+          "Onbekend"
+        },
+      pop6 =
+        if (hasName(p, "ddicmm042")){
+          case_match(p$ddicmm042, 0 ~ "-", 1 ~ "+",
+                     .default = "Onbekend")
+        } else {
+          "Onbekend"
+        },
+      indruklg =
+        if (hasName(p, "bds823")){
+          case_match(p$bds823, 1 ~ "Adequaat of sneller", 2 ~ "Langzaam",
+                     .default = "Onbekend")
+        } else {
+          "Onbekend"
+        },
+      taalomgeving =
+        if (hasName(p, "bds816")){
+          case_match(p$bds816, 1 ~ "Voldoende", 2 ~ "Matig", 3 ~ "Onvoldoende",
+                     .default = "Onbekend")
+        } else {
+          "Onbekend"
+        })
 
     req_names <- c("id", "name", needed, paste(dum, "NA", sep = "_"),
                    "bw", "woz", "agem", "agef", "ga", "eduf", "edum",
-                   "sex", "par", "urb", "ctrf", "ctrm")
+                   "sex", "par", "urb", "ctrf", "ctrm",
+                   "zin2w", "pop6", "indruklg", "taalomgeving")
     found <- hasName(z, req_names)
     if (any(!found)) stop("Could not find required name(s): ",
                           paste(req_names[!found], collapse = ", "))
@@ -191,14 +235,27 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
                           labels = bdsmodels::age_map$label)) |>
        filter(.data$gp %in% !! vtime) |>
        group_by(.data$yname, .data$gp) |>
-       arrange(.data$age) |>
        slice(n())|>
-       pivot_wider(names_from = yname, values_from = y) |>
+       pivot_wider(names_from = "yname", values_from = "y") |>
+       arrange(.data$age) |>
        right_join(data.frame(vtime, vname), by = c("gp"="vtime")) |>
        ungroup()
 
 
-     p <- tgt$psn
+     tpred <- c("ddicmm041", "ddicmm042", "bds823", "bds816")
+
+     ##Variables added for language model
+     lg <- tgt$xyz |>
+       select(all_of(c("age", "yname", "y"))) |>
+       filter(.data$age * 365.25 >= 678 & .data$age * 365.25 <= 1038 &
+                .data$yname %in% !!tpred) |>
+       group_by(.data$yname) |> dplyr::slice_tail(n = 1)|> #als meerderen metingen, laatste nemen voor elke variabele.
+       pivot_wider(names_from = "yname", values_from = "y") |>
+       select(-.data$age)
+
+
+   p <- tgt$psn
+   if(nrow(lg) == 1){p <- cbind(p, lg)}
 
     z <- tibble_row(
       id =
@@ -229,8 +286,9 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
     match_pc4(p, "woz"),
   agem =
     if (hasName(p, "agem")) {
-      if(!is.na(p$agem)) p$agem - 1
-      if(is.na(p$agem) & hasName(p, "dobm"))  as.numeric((Sys.Date() - as.Date(p$dobm)) / 365.25)
+      if(!is.na(p$agem)) {p$agem - 1}
+      else {
+        if(is.na(p$agem) & hasName(p, "dobm"))  {as.numeric((Sys.Date() - as.Date(p$dobm)) / 365.25)}}
     } else {
       if(hasName(p, "dobm")){
         as.numeric((Sys.Date() - as.Date(p$dobm)) / 365.25)
@@ -294,29 +352,59 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
   ctrf =
     match_country(p, out = "etng", inp = "blbf"),
   ctrm =
-    match_country(p, out = "etng", inp = "blbm"))
+    match_country(p, out = "etng", inp = "blbm"),
+  zin2w =
+    if (hasName(p, "ddicmm041")){
+      case_match(p$ddicmm041, 0 ~ "-", 1 ~ "+",
+                 .default = "Onbekend")
+    } else {
+      "Onbekend"
+    },
+  pop6 =
+    if (hasName(p, "ddicmm042")){
+      case_match(p$ddicmm042, 0 ~ "-", 1 ~ "+",
+                 .default = "Onbekend")
+    } else {
+      "Onbekend"
+    },
+  indruklg =
+    if (hasName(p, "bds823")){
+      case_match(p$bds823, 1 ~ "Adequaat of sneller", 2 ~ "Langzaam",
+                 .default = "Onbekend")
+    } else {
+      "Onbekend"
+    },
+  taalomgeving =
+    if (hasName(p, "bds816")){
+      case_match(p$bds816, 1 ~ "Voldoende", 2 ~ "Matig", 3 ~ "Onvoldoende",
+                 .default = "Onbekend")
+    } else {
+      "Onbekend"
+    })
+
 
 req_names <- c("id", "name",
                "bw", "woz", "agem", "agef", "ga", "eduf", "edum",
-               "sex", "par", "urb", "ctrf", "ctrm")
+               "sex", "par", "urb", "ctrf", "ctrm",
+               "zin2w", "pop6", "indruklg", "taalomgeving")
 found <- hasName(z, req_names)
 if (any(!found)) stop("Could not find required name(s): ",
                       paste(req_names[!found], collapse = ", "))
 
 tvl <-
 tvl |>
-  mutate(Datum = format(z$dob + age*365.25),
-         SDS = AGD::y2z(y = tvl$bmi,
+  mutate(Datum = format(z$dob + .data$age*365.25, "%d-%m-%Y"),
+         SDS = y2z(y = tvl$bmi,
                   x = tvl$age,
                   sex = ifelse(z$sex == "Meisje", "F", "M"),
                   ref = AGD::nl4.bmi),
-        hgt = hgt * 10,
+        hgt = .data$hgt * 10,
         mm = "mm",
-        wgt = wgt * 1000,
+        wgt = .data$wgt * 1000,
         g = "g"
          ) |>
-  rename(Bezoek = vname, Leeftijd = age, Lengte = hgt, Gewicht = wgt, BMI = bmi) |>
-  select(Bezoek, Datum, Leeftijd, Lengte, mm, Gewicht, g, BMI, SDS)
+  rename("Bezoek" = vname, "Leeftijd" = "age", "Lengte" = "hgt", "Gewicht" = "wgt", "BMI" = "bmi") |>
+  select(all_of(c("Bezoek", "Datum", "Leeftijd", "Lengte", "mm", "Gewicht", "g", "BMI", "SDS")))
 
 z <- list(psn = z,
           tv = tvl)
