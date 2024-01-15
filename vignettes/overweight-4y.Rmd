@@ -22,9 +22,9 @@ outcome <- "overweight-4y"
 ```
 
 ```{r setmodel, eval = FALSE}
-library(ranger)
-path <- path.expand("~/Project/zonmw_kansrijke_start/WP4/modellen_CBS/20230530/Overgewicht")
-model <- readRDS(file.path(path, fn_model))
+#library(ranger)
+#path <- path.expand("~/Project/zonmw_kansrijke_start/WP4/modellen_CBS/20230530/Overgewicht")
+#model <- readRDS(file.path(path, fn_model))
 ```
 
 ## Description
@@ -55,8 +55,8 @@ OOB prediction error (Brier s.):  0.0761
 The model contains 138 predictors. The names of the predictor variables, ordered in terms of their importance score, are
 
 ```{r eval = FALSE}
-v <- sort(round(importance(model), 1), decreasing = TRUE)
-data.frame(importance = v)
+#v <- sort(round(importance(model), 1), decreasing = TRUE)
+#data.frame(importance = v)
 ```
 
 ```
