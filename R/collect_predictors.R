@@ -351,6 +351,12 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
     } else {
       "Onbekend"
     },
+  pc4 =
+    if(hasName(p, "pc4")){
+      as.numeric(p$pc4)
+     } else {
+        NA_real_
+    },
   urb =
     match_pc4(p, "urb"),
   ctrf =
@@ -389,9 +395,8 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
 
 req_names <- c("id", "name",
                "bw", "woz", "agem", "agef", "ga", "eduf", "edum",
-               "sex", "par", "urb", "ctrf", "ctrm",
+               "sex", "par","pc4", "urb", "ctrf", "ctrm",
                "zin2w", "pop6", "indruklg", "taalomgeving")
-found <- hasName(z, req_names)
 if (any(!found)) stop("Could not find required name(s): ",
                       paste(req_names[!found], collapse = ", "))
 
