@@ -22,10 +22,19 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
+    <loc>/reference/age_map.html</loc>
+  </url>
+  <url>
     <loc>/reference/collect_predictors.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/map_varnames.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mapping.html</loc>
   </url>
   <url>
     <loc>/reference/pc4.html</loc>

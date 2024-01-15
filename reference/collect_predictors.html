@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bdsmodels</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.3</span>
       </span>
     </div>
 
@@ -57,17 +57,23 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">collect_predictors</span><span class="op">(</span><span class="va">tgt</span>, outcome <span class="op">=</span> <span class="st">"overweight-4y"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">collect_predictors</span><span class="op">(</span>tgt <span class="op">=</span> <span class="cn">NULL</span>, outcome <span class="op">=</span> <span class="st">"overweight-4y"</span>, purpose <span class="op">=</span> <span class="st">"tab10"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>tgt</dt>
-<dd><p>Target person data, according to JAMES internal format from <code>bdsreader</code></p></dd>
+<dd><p>Target person data, according to JAMES internal format from <code>bdsreader</code>.
+If <code>tgt = NULL</code> (default) the function returns an empty data with all values
+set to missings.</p></dd>
 
 
 <dt>outcome</dt>
 <dd><p>Character. Currently only <code>"overweight-4y"</code></p></dd>
+
+
+<dt>purpose</dt>
+<dd><p>Character. Purpose for the predictor data, can be <code>"model"</code> or <code>"tab10"</code>.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -86,8 +92,12 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     table34</span>
 <span class="r-in"><span><span class="va">fn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/test.json"</span>, package <span class="op">=</span> <span class="st">"bdsreader"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bdsreader</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bdsreader/man/read_bds.html" class="external-link">read_bds</a></span><span class="op">(</span><span class="va">fn</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fn</span> <span class="op">&lt;-</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/bds_v2.0/smocc/Anne_S.json"</span>, package <span class="op">=</span> <span class="st">"jamesdemodata"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">bdsreader</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/bdsreader/man/read_bds.html" class="external-link">read_bds</a></span><span class="op">(</span><span class="va">fn</span>, append_ddi <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Cannot read 'txt': /home/runner/work/_temp/Library/jamesdemodata/extdata/bds_v2.0/smocc/Anne_S.json</span>
+<span class="r-in"><span><span class="va">tgt</span> <span class="op">&lt;-</span> <span class="va">m</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">collect_predictors</span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in case_match(p$eduf, c(1, 2) ~ "Geen, Basis", 3 ~ "VMBO-P", c(4,     5) ~ "VMBO-T, MAVO", 6 ~ "MBO", 7 ~ "HAVO, VWO", 8 ~ "HBO",     9 ~ "WO, MASTER", .default = "Onbekend"):</span> Can't convert `..1 (left)` &lt;double&gt; to &lt;character&gt;.</span>
 </code></pre></div>
     </div>
   </div>
