@@ -24,6 +24,8 @@ Fill risk predictor data with target person data
 \examples{
 library(bdsreader)
 fn <- system.file("examples/test.json", package = "bdsreader")
-m <- bdsreader::read_bds(fn)
+fn <-system.file("extdata/bds_v2.0/smocc/Anne_S.json", package = "jamesdemodata")
+m <- bdsreader::read_bds(fn, append_ddi = TRUE)
+tgt <- m
 x <- collect_predictors(m)
 }

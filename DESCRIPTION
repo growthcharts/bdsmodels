@@ -10,7 +10,7 @@ Description: Risk prediction models for data collected in the Basisdatatset
 License: AGPL (>= 3)
 Encoding: UTF-8
 Imports: 
-    centile,
+    AGD,
     dplyr,
     nlreferences,
     rlang,

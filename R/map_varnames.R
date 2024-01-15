@@ -11,7 +11,7 @@
 #' library(bdsreader)
 #' fn <- system.file("examples/test.json", package = "bdsreader")
 #' m <- bdsreader::read_bds(fn)
-#' x <- collect_predictors(m)
+#' x <- collect_predictors(m, purpose = "model")
 #' ex <- map_varnames(x)
 #' @export
 map_varnames <- function(data = NULL,
