@@ -397,6 +397,7 @@ req_names <- c("id", "name",
                "bw", "woz", "agem", "agef", "ga", "eduf", "edum",
                "sex", "par","pc4", "urb", "ctrf", "ctrm",
                "zin2w", "pop6", "indruklg", "taalomgeving")
+found <- hasName(z, req_names)
 if (any(!found)) stop("Could not find required name(s): ",
                       paste(req_names[!found], collapse = ", "))
 
