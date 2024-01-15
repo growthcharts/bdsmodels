@@ -360,9 +360,29 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
   urb =
     match_pc4(p, "urb"),
   ctrf =
-    match_country(p, out = "land", inp = "blbf"),
+    if (!hasName(p, "blbf")) {
+      factor("Onbekend",levels = levels(bdsmodels::table34$land))
+    } else
+      if(!is.na(p$blbf)){
+  bdsmodels::table34 |>
+    filter(.data$code == !! p$blbf) |>
+    pull(!!"land") |>
+    first(na_rm = TRUE)
+      } else{
+      "Onbekend"
+    },
   ctrm =
-    match_country(p, out = "land", inp = "blbm"),
+    if (!hasName(p, "blbm")) {
+      factor("Onbekend",levels = levels(bdsmodels::table34$land))
+    } else
+      if(!is.na(p$blbm)){
+        bdsmodels::table34 |>
+          filter(.data$code == !! p$blbm) |>
+          pull(!!"land") |>
+          first(na_rm = TRUE)
+      } else{
+        "Onbekend"
+      },
   zin2w =
     if (hasName(p, "ddicmm041")){
       case_match(p$ddicmm041, 0 ~ "-", 1 ~ "+",
@@ -441,7 +461,7 @@ match_country <- function(p, out = c("etng", "land"), inp = c("blbf", "blbm")) {
   inp <- match.arg(inp)
   if (!hasName(p, inp)) {
     return(factor(NA_character_,
-                  levels = levels(bdsmodels::table34$achts)))
+                  levels = levels(bdsmodels::table34[[out]])))
   }
   bdsmodels::table34 |>
     filter(.data$code == !! p[[inp]]) |>

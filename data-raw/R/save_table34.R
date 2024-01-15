@@ -47,15 +47,14 @@ labels <- c("Nederland",
             "Antillen en Aruba",
             "Overige niet-westers",
             "Overige westers",
-            "Onbekend",
-            "Overige landen")
+            "Onbekend")
 table34$land <- dplyr::case_match(table34$code,
                                   6030 ~ "Nederland",
                                   5022 ~ "Marokko",
                                   c(6043, 7094, 8019) ~ "Turkije",
                                   5007 ~ "Suriname",
                                   c(7011, 5095, 5106, 5107, 5108, 5109, 5110) ~ "Antillen en Aruba",
-                                  .default = "Overige landen")
+                                  .default = "Onbekend")
 
 table34$land <- factor(table34$land,
                        levels = labels)
