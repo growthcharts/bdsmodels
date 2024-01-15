@@ -38,4 +38,26 @@ table34$etng <- dplyr::case_match(table34$code,
 table34$etng <- factor(table34$etng,
                        levels = labels)
 
+
+
+labels <- c("Nederland",
+            "Marokko",
+            "Turkije",
+            "Suriname",
+            "Antillen en Aruba",
+            "Overige niet-westers",
+            "Overige westers",
+            "Onbekend",
+            "Overige landen")
+table34$land <- dplyr::case_match(table34$code,
+                                  6030 ~ "Nederland",
+                                  5022 ~ "Marokko",
+                                  c(6043, 7094, 8019) ~ "Turkije",
+                                  5007 ~ "Suriname",
+                                  c(7011, 5095, 5106, 5107, 5108, 5109, 5110) ~ "Antillen en Aruba",
+                                  .default = "Overige landen")
+
+table34$land <- factor(table34$land,
+                       levels = labels)
+
 usethis::use_data(table34, overwrite = TRUE)

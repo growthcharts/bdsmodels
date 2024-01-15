@@ -171,9 +171,9 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
       urb =
         match_pc4(p, "urb"),
       ctrf =
-        match_country(p, out = "etng", inp = "blbf"),
+        match_country(p, out = "land", inp = "blbf"),
       ctrm =
-        match_country(p, out = "etng", inp = "blbm"),
+        match_country(p, out = "land", inp = "blbm"),
       zin2w =
         if (hasName(p, "ddicmm041")){
           case_match(p$ddicmm041, 0 ~ "-", 1 ~ "+",
@@ -360,9 +360,9 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
   urb =
     match_pc4(p, "urb"),
   ctrf =
-    match_country(p, out = "etng", inp = "blbf"),
+    match_country(p, out = "land", inp = "blbf"),
   ctrm =
-    match_country(p, out = "etng", inp = "blbm"),
+    match_country(p, out = "land", inp = "blbm"),
   zin2w =
     if (hasName(p, "ddicmm041")){
       case_match(p$ddicmm041, 0 ~ "-", 1 ~ "+",
@@ -436,7 +436,7 @@ match_pc4 <- function(p, out = c("woz", "urb")) {
     first(na_rm = TRUE)
 }
 
-match_country <- function(p, out = c("etng"), inp = c("blbf", "blbm")) {
+match_country <- function(p, out = c("etng", "land"), inp = c("blbf", "blbm")) {
   out <- match.arg(out)
   inp <- match.arg(inp)
   if (!hasName(p, inp)) {
