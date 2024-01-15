@@ -241,6 +241,10 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
        right_join(data.frame(vtime, vname), by = c("gp"="vtime")) |>
        ungroup()
 
+     if(!hasName(tvl, "hgt")){tvl$hgt <- NA}
+     if(!hasName(tvl, "wgt")){tvl$wgt <- NA}
+     if(!hasName(tvl, "bmi")){tvl$bmi <- NA}
+
 
      tpred <- c("ddicmm041", "ddicmm042", "bds823", "bds816")
 
@@ -251,7 +255,7 @@ collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = 
                 .data$yname %in% !!tpred) |>
        group_by(.data$yname) |> dplyr::slice_tail(n = 1)|> #als meerderen metingen, laatste nemen voor elke variabele.
        pivot_wider(names_from = "yname", values_from = "y") |>
-       select(-.data$age)
+       select(-"age")
 
 
    p <- tgt$psn
