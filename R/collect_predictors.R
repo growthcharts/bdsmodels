@@ -10,9 +10,10 @@
 #' library(bdsreader)
 #' fn <- system.file("examples/test.json", package = "bdsreader")
 #' fn <-system.file("extdata/bds_v2.0/smocc/Anne_S.json", package = "jamesdemodata")
+#' fn <-system.file("extdata/bds_v2.0/smocc/Laura_S.json", package = "jamesdemodata")
 #' m <- bdsreader::read_bds(fn, append_ddi = TRUE)
 #' tgt <- m
-#' x <- collect_predictors(m)
+#' x <- collect_predictors(m, purpose = "tab10")
 #' @export
 collect_predictors <- function(tgt = NULL, outcome = "overweight-4y", purpose = "tab10") {
   z <- NULL
